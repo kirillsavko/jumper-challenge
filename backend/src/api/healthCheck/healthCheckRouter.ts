@@ -16,7 +16,7 @@ export const healthCheckRouter: Router = (() => {
     method: 'get',
     path: '/health-check',
     tags: ['Health Check'],
-    responses: createApiResponse(z.null(), 'Success'),
+    responses: createApiResponse({ schema: z.null(), description: 'Success' }),
   });
 
   router.get('/', (_req: Request, res: Response) => {

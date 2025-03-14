@@ -1,41 +1,37 @@
+import { ResponseConfig } from '@asteasolutions/zod-to-openapi';
 import { StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 
 import { ServiceResponseSchema } from '@/common/models/serviceResponse';
 
-export function createApiResponse(schema: z.ZodTypeAny, description: string, statusCode = StatusCodes.OK) {
-  return {
-    [statusCode]: {
-      description,
+/** Represents config structure of open API response */
+export type ApiResponseConfig = {
+  schema: z.ZodTypeAny;
+  description: string;
+  statusCode?: StatusCodes;
+};
+
+/**
+ * Creates open API response for the given configuration
+ * @param config Configuration the open API response should be created for
+ * @return Created open API response
+ */
+export function createApiResponse(config: ApiResponseConfig | ApiResponseConfig[]): Record<number, ResponseConfig> {
+  const configs = Array.isArray(config) ? config : [config];
+
+  const responses: Record<number, ResponseConfig> = {};
+
+  configs.forEach((config) => {
+    const statusCode = config.statusCode || StatusCodes.OK;
+    responses[statusCode] = {
+      description: config.description,
       content: {
         'application/json': {
-          schema: ServiceResponseSchema(schema),
+          schema: ServiceResponseSchema(config.schema),
         },
       },
-    },
-  };
+    };
+  });
+
+  return responses;
 }
-
-// Use if you want multiple responses for a single endpoint
-
-// import { ResponseConfig } from '@asteasolutions/zod-to-openapi';
-// import { ApiResponseConfig } from '@common/models/openAPIResponseConfig';
-// export type ApiResponseConfig = {
-//   schema: z.ZodTypeAny;
-//   description: string;
-//   statusCode: StatusCodes;
-// };
-// export function createApiResponses(configs: ApiResponseConfig[]) {
-//   const responses: { [key: string]: ResponseConfig } = {};
-//   configs.forEach(({ schema, description, statusCode }) => {
-//     responses[statusCode] = {
-//       description,
-//       content: {
-//         'application/json': {
-//           schema: ServiceResponseSchema(schema),
-//         },
-//       },
-//     };
-//   });
-//   return responses;
-// }
