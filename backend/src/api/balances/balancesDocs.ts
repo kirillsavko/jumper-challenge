@@ -1,22 +1,12 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { ethers } from 'ethers';
 import { StatusCodes } from 'http-status-codes';
 
+import { addressSchema } from '@/api/balances/balancesService';
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import { z } from '@/common/config/zod';
 
 /** Main registry for the balances API */
 export const balancesRegistry = new OpenAPIRegistry();
-
-/** Schema for validating Ethereum addresses */
-export const addressSchema = z
-  .string()
-  .openapi({
-    param: { name: 'address', in: 'path', required: true },
-    example: '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-    description: 'Ethereum address',
-  })
-  .refine((address) => ethers.isAddress(address), { message: 'Invalid Ethereum address' });
 
 /** All expected api responses for balances */
 const apiResponses = createApiResponse([
