@@ -3,6 +3,7 @@ import express, { Express } from 'express';
 import helmet from 'helmet';
 import { pino } from 'pino';
 
+import { authRouter } from '@/api/auth/authRouter';
 import { balancesRouter } from '@/api/balances/balancesRouter';
 import { openAPIRouter } from '@/api-docs/openAPIRouter';
 import errorHandler from '@/common/middleware/errorHandler';
@@ -27,6 +28,7 @@ app.use(requestLogger);
 
 // Routes
 app.use('/balances', balancesRouter);
+app.use('/auth', authRouter);
 
 // Swagger UI
 app.use(openAPIRouter);
