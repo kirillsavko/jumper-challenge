@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import request from 'supertest';
 import { vi } from 'vitest';
 
+import { balancesService } from '@/api/balances/balancesService';
 import { ServiceResponse } from '@/common/models/serviceResponse';
 import { alchemyService } from '@/common/utils/alchemy';
 import { app } from '@/server';
@@ -9,13 +10,15 @@ import { app } from '@/server';
 describe('Balances API endpoints', () => {
   beforeEach(() => {
     vi.spyOn(alchemyService, 'getTokenBalances').mockReturnValue(
-      Promise.resolve([
-        {
-          contractAddress: '0x123',
-          tokenBalance: '0',
-          error: null,
-        },
-      ])
+      Promise.resolve({
+        balances: [
+          {
+            contractAddress: '0x123',
+            tokenBalance: '0',
+            error: null,
+          },
+        ],
+      })
     );
   });
 
@@ -25,13 +28,15 @@ describe('Balances API endpoints', () => {
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(result.success).toBeTruthy();
-    expect(result.responseObject).toStrictEqual([
-      {
-        contractAddress: '0x123',
-        tokenBalance: '0',
-        error: null,
-      },
-    ]);
+    expect(result.responseObject).toStrictEqual({
+      balances: [
+        {
+          contractAddress: '0x123',
+          tokenBalance: '0',
+          error: null,
+        },
+      ],
+    });
     expect(result.message).toBe('Success');
   });
 
@@ -59,5 +64,12 @@ describe('Balances API endpoints', () => {
       error: 'Unexpected alchemy error',
     });
     expect(result.message).toBe('Unexpected alchemy error');
+  });
+
+  it('Passing pageKey - success', async () => {
+    vi.spyOn(balancesService, 'getBalances').mockImplementationOnce(vi.fn());
+    await request(app).get('/balances/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045?pageKey=abc123');
+
+    expect(balancesService.getBalances).toHaveBeenCalledWith('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', 'abc123');
   });
 });

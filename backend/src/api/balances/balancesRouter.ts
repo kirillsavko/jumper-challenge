@@ -4,14 +4,16 @@ import { StatusCodes } from 'http-status-codes';
 import { balancesService, WrongAddress } from '@/api/balances/balancesService';
 import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse';
 import { handleServiceResponse } from '@/common/utils/httpHandlers';
+import { isValueString } from '@/common/utils/typescript';
 
 /** Router for balance requests */
 export const balancesRouter: Router = (() => {
   const router = express.Router();
 
   router.get('/:address', async (req: Request, res: Response) => {
+    const pageKey = isValueString(req.query.pageKey) ? req.query.pageKey : undefined;
     try {
-      const balances = await balancesService.getBalances(req.params.address);
+      const balances = await balancesService.getBalances(req.params.address, pageKey);
       return handleServiceResponse(
         new ServiceResponse(ResponseStatus.Success, 'Success', balances, StatusCodes.OK),
         res

@@ -1,7 +1,7 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 import { StatusCodes } from 'http-status-codes';
 
-import { addressSchema } from '@/api/balances/balancesService';
+import { addressSchema, pageKeySchema } from '@/api/balances/balancesService';
 import { createApiResponse } from '@/api-docs/openAPIResponseBuilders';
 import { z } from '@/common/config/zod';
 
@@ -11,12 +11,15 @@ export const balancesRegistry = new OpenAPIRegistry();
 /** All expected api responses for balances */
 const apiResponses = createApiResponse([
   {
-    schema: z.array(
-      z.object({
-        contractAddress: z.string(),
-        tokenBalance: z.string(),
-      })
-    ),
+    schema: z.object({
+      balances: z.array(
+        z.object({
+          contractAddress: z.string(),
+          tokenBalance: z.string(),
+        })
+      ),
+      pageKey: z.string(),
+    }),
     description: 'Success',
     statusCode: StatusCodes.OK,
   },
@@ -42,6 +45,7 @@ balancesRegistry.registerPath({
   tags: ['Balances'],
   request: {
     params: z.object({ address: addressSchema }),
+    query: z.object({ pageKey: pageKeySchema }),
   },
   responses: apiResponses,
 });

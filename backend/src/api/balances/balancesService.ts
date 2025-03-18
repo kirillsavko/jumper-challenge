@@ -1,8 +1,7 @@
-import { TokenBalance } from 'alchemy-sdk';
 import { ethers } from 'ethers';
 
 import { z } from '@/common/config/zod';
-import { alchemyService } from '@/common/utils/alchemy';
+import { alchemyService, TokenBalances } from '@/common/utils/alchemy';
 
 /** When the given Ethereum address is wrong */
 export class WrongAddress extends Error {
@@ -11,7 +10,7 @@ export class WrongAddress extends Error {
   }
 }
 
-/** Schema for validating Ethereum addresses */
+/** Schema for validating Ethereum address */
 export const addressSchema = z
   .string()
   .openapi({
@@ -22,16 +21,23 @@ export const addressSchema = z
   .min(1, 'Ethereum address must be not empty')
   .refine((address) => ethers.isAddress(address), { message: 'Invalid Ethereum address' });
 
+/** Schema for validating page key */
+export const pageKeySchema = z.string().openapi({
+  param: { name: 'pageKey', in: 'query', required: false },
+  example: '',
+  description: 'Key for the next page',
+});
+
 /** Balances service with all logic regarding balances */
 class BalancesService {
-  getBalances(address: string): Promise<TokenBalance[]> {
+  getBalances(address: string, pageKey?: string): Promise<TokenBalances> {
     const parseAddressResult = addressSchema.safeParse(address);
 
     if (!parseAddressResult.success) {
       throw new WrongAddress(parseAddressResult.error.format()._errors.join(', '));
     }
 
-    return alchemyService.getTokenBalances(address);
+    return alchemyService.getTokenBalances(address, pageKey);
   }
 }
 
