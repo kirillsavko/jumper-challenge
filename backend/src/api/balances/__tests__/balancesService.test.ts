@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { balancesService, WrongAddress } from '@/api/balances/balancesService';
+import { balancesService, WrongAddressError } from '@/api/balances/balancesService';
 import { alchemyService } from '@/common/utils/alchemy';
 
 describe('Balances service', () => {
@@ -32,6 +32,6 @@ describe('Balances service', () => {
   });
 
   it('getBalances - fail due wrong address', () => {
-    expect(() => balancesService.getBalances('invalid-address')).toThrow(WrongAddress);
+    expect(() => balancesService.getBalances('invalid-address')).toThrow(WrongAddressError);
   });
 });

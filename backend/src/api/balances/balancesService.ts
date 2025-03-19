@@ -4,7 +4,7 @@ import { z } from '@/common/config/zod';
 import { alchemyService, TokenBalances } from '@/common/utils/alchemy';
 
 /** When the given Ethereum address is wrong */
-export class WrongAddress extends Error {
+export class WrongAddressError extends Error {
   constructor(error: string) {
     super(error);
   }
@@ -34,7 +34,7 @@ class BalancesService {
     const parseAddressResult = addressSchema.safeParse(address);
 
     if (!parseAddressResult.success) {
-      throw new WrongAddress(parseAddressResult.error.format()._errors.join(', '));
+      throw new WrongAddressError(parseAddressResult.error.format()._errors.join(', '));
     }
 
     return alchemyService.getTokenBalances(address, pageKey);

@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MESSAGE_TO_SIGN } from '@/api/auth/authConstants';
-import { authService, InvalidSignature, UserExists, WrongInput } from '@/api/auth/authService';
+import { authService, InvalidSignatureError, UserExistsError, WrongInputError } from '@/api/auth/authService';
 import { userRepository } from '@/api/user/userRepository';
 import { alchemyService } from '@/common/utils/alchemy';
 
@@ -26,20 +26,22 @@ describe('Auth service', () => {
     expect(token).toBe('mocked-jwt-token');
   });
 
-  it('Login error - throws WrongInput if address or signature is empty', async () => {
-    await expect(() => authService.login('', '0x...')).rejects.toThrow(WrongInput);
-    await expect(() => authService.login('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', '')).rejects.toThrow(WrongInput);
+  it('Login error - throws WrongInputError if address or signature is empty', async () => {
+    await expect(() => authService.login('', '0x...')).rejects.toThrow(WrongInputError);
+    await expect(() => authService.login('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', '')).rejects.toThrow(
+      WrongInputError
+    );
   });
 
-  it('Login error - throws WrongInput if address is invalid', async () => {
-    await expect(() => authService.login('invalid-address', '0x...')).rejects.toThrow(WrongInput);
+  it('Login error - throws WrongInputError if address is invalid', async () => {
+    await expect(() => authService.login('invalid-address', '0x...')).rejects.toThrow(WrongInputError);
   });
 
-  it('Login error - throws InvalidSignature if signature does not match', async () => {
+  it('Login error - throws InvalidSignatureError if signature does not match', async () => {
     const validSignature = await wallet.signMessage(MESSAGE_TO_SIGN);
 
     await expect(() => authService.login('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045', validSignature)).rejects.toThrow(
-      InvalidSignature
+      InvalidSignatureError
     );
   });
 
@@ -84,27 +86,31 @@ describe('Auth service', () => {
     expect(result).toStrictEqual(user);
   });
 
-  it('Register error - throws WrongInput if address is empty', async () => {
-    await expect(() => authService.register('')).rejects.toThrow(WrongInput);
+  it('Register error - throws WrongInputError if address is empty', async () => {
+    await expect(() => authService.register('')).rejects.toThrow(WrongInputError);
   });
 
-  it('Register error - throws WrongInput if address is invalid', async () => {
-    await expect(() => authService.register('invalid-address')).rejects.toThrow(WrongInput);
+  it('Register error - throws WrongInputError if address is invalid', async () => {
+    await expect(() => authService.register('invalid-address')).rejects.toThrow(WrongInputError);
   });
 
-  it('Register error - throws UserExists if user exists', async () => {
+  it('Register error - throws UserExistsError if user exists', async () => {
     vi.spyOn(userRepository, 'getUserByAddress').mockResolvedValue({
       address: 'test',
       balance: '',
       id: '',
       createdAt: new Date(),
     });
-    await expect(() => authService.register('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf')).rejects.toThrow(UserExists);
+    await expect(() => authService.register('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf')).rejects.toThrow(
+      UserExistsError
+    );
   });
 
-  it('Register error - throws WrongInput if sum up is invalid', async () => {
+  it('Register error - throws WrongInputError if sum up is invalid', async () => {
     vi.spyOn(userRepository, 'getUserByAddress').mockResolvedValue(null);
     vi.spyOn(alchemyService, 'getAllTokenBalancesSum').mockResolvedValue(NaN);
-    await expect(() => authService.register('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf')).rejects.toThrow(WrongInput);
+    await expect(() => authService.register('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf')).rejects.toThrow(
+      WrongInputError
+    );
   });
 });

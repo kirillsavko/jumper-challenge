@@ -9,21 +9,21 @@ import { alchemyService } from '@/common/utils/alchemy';
 import { env } from '@/common/utils/envConfig';
 
 /** When the given body input is wrong */
-export class WrongInput extends Error {
+export class WrongInputError extends Error {
   constructor(error: string) {
     super(error);
   }
 }
 
 /** When the invalid signature for login is provided */
-export class InvalidSignature extends Error {
+export class InvalidSignatureError extends Error {
   constructor() {
     super('The given signature is invalid for the given account');
   }
 }
 
 /** When the invalid signature for login is provided */
-export class UserExists extends Error {
+export class UserExistsError extends Error {
   constructor() {
     super('The user already exists');
   }
@@ -66,19 +66,19 @@ class AuthService {
     const parseAddressResult = authRegisterAddressSchema.safeParse({ address });
     if (!parseAddressResult.success) {
       const parsedError = parseAddressResult.error.errors.map((e) => e.message).join(', ');
-      throw new WrongInput(parsedError);
+      throw new WrongInputError(parsedError);
     }
 
     const foundUser = await userRepository.getUserByAddress(address);
     if (foundUser) {
-      throw new UserExists();
+      throw new UserExistsError();
     }
 
     const tokenBalancesSumUp = (await alchemyService.getAllTokenBalancesSum(address)).toString();
     const parseBalanceResult = authRegisterBalanceSchema.safeParse({ balance: tokenBalancesSumUp });
     if (!parseBalanceResult.success) {
       const parsedError = parseBalanceResult.error.errors.map((e) => e.message).join(', ');
-      throw new WrongInput(parsedError);
+      throw new WrongInputError(parsedError);
     }
 
     return userRepository.insertUser(address, tokenBalancesSumUp);
@@ -88,12 +88,12 @@ class AuthService {
     const parseResult = authLoginRequestSchema.safeParse({ address, signature });
     if (!parseResult.success) {
       const parsedError = parseResult.error.errors.map((e) => e.message).join(', ');
-      throw new WrongInput(parsedError);
+      throw new WrongInputError(parsedError);
     }
 
     const recoveredAddress = ethers.verifyMessage(MESSAGE_TO_SIGN, signature);
     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-      throw new InvalidSignature();
+      throw new InvalidSignatureError();
     }
 
     const foundUser = await userRepository.getUserByAddress(address);

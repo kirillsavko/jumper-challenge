@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { balancesService, WrongAddress } from '@/api/balances/balancesService';
+import { balancesService, WrongAddressError } from '@/api/balances/balancesService';
 import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse';
 import { handleServiceResponse } from '@/common/utils/httpHandlers';
 import { isValueString } from '@/common/utils/typescript';
@@ -21,7 +21,7 @@ export const balancesRouter: Router = (() => {
     } catch (e) {
       if (e instanceof Error) {
         switch (e.constructor) {
-          case WrongAddress:
+          case WrongAddressError:
             return handleServiceResponse(
               new ServiceResponse(
                 ResponseStatus.Failed,

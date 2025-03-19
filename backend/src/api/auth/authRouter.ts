@@ -2,7 +2,7 @@ import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { MESSAGE_TO_SIGN, oneHourInMs, tokenCookieName } from '@/api/auth/authConstants';
-import { authService, InvalidSignature, WrongInput } from '@/api/auth/authService';
+import { authService, InvalidSignatureError, WrongInputError } from '@/api/auth/authService';
 import { z } from '@/common/config/zod';
 import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse';
 import { handleServiceResponse } from '@/common/utils/httpHandlers';
@@ -38,7 +38,7 @@ export const authRouter: Router = (() => {
     } catch (e) {
       if (e instanceof Error) {
         switch (e.constructor) {
-          case WrongInput:
+          case WrongInputError:
             return handleServiceResponse(
               new ServiceResponse(
                 ResponseStatus.Failed,
@@ -48,7 +48,7 @@ export const authRouter: Router = (() => {
               ),
               res
             );
-          case InvalidSignature:
+          case InvalidSignatureError:
             return handleServiceResponse(
               new ServiceResponse(ResponseStatus.Failed, 'Invalid signature', null, StatusCodes.UNAUTHORIZED),
               res
