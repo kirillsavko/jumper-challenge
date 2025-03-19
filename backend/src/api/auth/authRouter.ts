@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { MESSAGE_TO_SIGN, oneHourInMs, tokenCookieName } from '@/api/auth/authConstants';
+import { MESSAGE_TO_SIGN, ONE_HOUR_IN_MS, TOKEN_COOKIE_NAME } from '@/api/auth/authConstants';
 import { authService, InvalidSignatureError, WrongInputError } from '@/api/auth/authService';
 import { z } from '@/common/config/zod';
 import { ResponseStatus, ServiceResponse } from '@/common/models/serviceResponse';
@@ -26,10 +26,10 @@ export const authRouter: Router = (() => {
   router.post('/login', async (req: Request, res: Response) => {
     try {
       const token = await authService.login(req.body.address, req.body.signature);
-      res.cookie(tokenCookieName, token, {
+      res.cookie(TOKEN_COOKIE_NAME, token, {
         httpOnly: true,
         secure: true,
-        maxAge: oneHourInMs,
+        maxAge: ONE_HOUR_IN_MS,
       });
       return handleServiceResponse(
         new ServiceResponse(ResponseStatus.Success, 'Authenticated successfully', { token }, StatusCodes.OK),
@@ -69,7 +69,7 @@ export const authRouter: Router = (() => {
   });
 
   router.post('/logout', (_req: Request, res: Response) => {
-    res.clearCookie(tokenCookieName);
+    res.clearCookie(TOKEN_COOKIE_NAME);
     return handleServiceResponse(
       new ServiceResponse(ResponseStatus.Success, 'User successfully logged out', z.null(), StatusCodes.OK),
       res

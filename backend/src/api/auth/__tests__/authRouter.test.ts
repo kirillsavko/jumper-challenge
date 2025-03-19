@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MESSAGE_TO_SIGN, tokenCookieName } from '@/api/auth/authConstants';
+import { MESSAGE_TO_SIGN, TOKEN_COOKIE_NAME } from '@/api/auth/authConstants';
 import { app } from '@/server';
 
 describe('Auth API endpoints', () => {
@@ -30,7 +30,7 @@ describe('Auth API endpoints', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBe('User successfully logged out');
     const cookies = response.get('set-cookie') as unknown as string[] | undefined;
-    const authCookie = cookies?.find((cookie) => cookie.startsWith(`${tokenCookieName}=`));
+    const authCookie = cookies?.find((cookie) => cookie.startsWith(`${TOKEN_COOKIE_NAME}=`));
     // It means the cookie is empty
     expect(authCookie).toMatch(/jwt-token=;/);
   });
@@ -50,7 +50,7 @@ describe('Auth API endpoints', () => {
     // response.get return type `string | undefined` when it's actually `string[] | undefined`
     const cookies = response.get('set-cookie') as unknown as string[] | undefined;
     expect(cookies).toBeDefined();
-    const authCookie = cookies?.find((cookie) => cookie.startsWith(`${tokenCookieName}=`));
+    const authCookie = cookies?.find((cookie) => cookie.startsWith(`${TOKEN_COOKIE_NAME}=`));
     expect(authCookie).toBeDefined();
     // It means the cookie is empty
     expect(authCookie).not.toMatch(/jwt-token=;/);
