@@ -1,16 +1,20 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { alchemyService, TokenBalances } from '@/common/utils/alchemy';
 
 describe('AlchemyClient', () => {
-  it('should fetch token balances correctly', async () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('Fetches token balances correctly', async () => {
     const response: TokenBalances = {
       balances: [
         { contractAddress: '0x123', tokenBalance: '100', error: null },
         { contractAddress: '0x456', tokenBalance: '200', error: null },
       ],
     };
-    vi.spyOn(alchemyService, 'getTokenBalances').mockReturnValue(Promise.resolve(response));
+    vi.spyOn(alchemyService, 'getTokenBalances').mockResolvedValue(response);
 
     const result = await alchemyService.getTokenBalances('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045');
     expect(alchemyService.getTokenBalances).toHaveBeenCalledWith('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045');
@@ -18,8 +22,8 @@ describe('AlchemyClient', () => {
     expect(result).toEqual(response);
   });
 
-  it('should return an empty array if no balances are found', async () => {
-    vi.spyOn(alchemyService, 'getTokenBalances').mockReturnValue(Promise.resolve({ balances: [] }));
+  it('Returns an empty array if no balances are found', async () => {
+    vi.spyOn(alchemyService, 'getTokenBalances').mockResolvedValue({ balances: [] });
 
     const result = await alchemyService.getTokenBalances('0x0000000000000000000000000000000000000000');
 
@@ -27,7 +31,7 @@ describe('AlchemyClient', () => {
     expect(result).toEqual({ balances: [] });
   });
 
-  it('should handle API errors gracefully', async () => {
+  it('Handles API errors correctly', async () => {
     vi.spyOn(alchemyService, 'getTokenBalances').mockRejectedValue(new Error('API Error'));
 
     await expect(alchemyService.getTokenBalances('0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045')).rejects.toThrow(
@@ -35,5 +39,26 @@ describe('AlchemyClient', () => {
     );
 
     expect(alchemyService.getTokenBalances).toHaveBeenCalled();
+  });
+
+  it('Returns the sum of token balances', async () => {
+    vi.spyOn(alchemyService, 'getTokenBalances').mockResolvedValue({
+      balances: [
+        { contractAddress: '0x123', tokenBalance: '100', error: null },
+        { contractAddress: '0x456', tokenBalance: '200', error: null },
+      ],
+    });
+
+    const result = await alchemyService.getAllTokenBalancesSum('test');
+    expect(result).toBe(300);
+  });
+
+  it('Returns 0 if there are no token balances', async () => {
+    vi.spyOn(alchemyService, 'getTokenBalances').mockResolvedValue({
+      balances: [],
+    });
+
+    const result = await alchemyService.getAllTokenBalancesSum('test');
+    expect(result).toBe(0);
   });
 });

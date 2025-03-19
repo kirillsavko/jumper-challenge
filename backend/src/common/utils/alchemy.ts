@@ -12,6 +12,29 @@ export type TokenBalances = {
 
 class AlchemyClient {
   constructor(private readonly alchemyClient: Alchemy) {}
+
+  /**
+   * Returns all token balances sum for the given address
+   * @param address Address the sump up of tokens should be returned
+   * @return Sum up of all token balances for the given address
+   */
+  async getAllTokenBalancesSum(address: string): Promise<number> {
+    let totalBalance = 0;
+    let nextPageKey: string | undefined;
+
+    do {
+      const { balances, pageKey } = await alchemyService.getTokenBalances(address, nextPageKey);
+
+      balances.forEach((balance) => {
+        totalBalance += Number(balance.tokenBalance);
+      });
+
+      nextPageKey = pageKey;
+    } while (nextPageKey);
+
+    return totalBalance;
+  }
+
   /**
    * Gets token balances for the given address
    * @param address Address the token balances should be got for

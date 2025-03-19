@@ -5,6 +5,7 @@ import { pino } from 'pino';
 
 import { authRouter } from '@/api/auth/authRouter';
 import { balancesRouter } from '@/api/balances/balancesRouter';
+import { userRouter } from '@/api/user/userRouter'
 import { openAPIRouter } from '@/api-docs/openAPIRouter';
 import errorHandler from '@/common/middleware/errorHandler';
 import rateLimiter from '@/common/middleware/rateLimiter';
@@ -29,6 +30,7 @@ app.use(requestLogger);
 // Routes
 app.use('/balances', balancesRouter);
 app.use('/auth', authRouter);
+app.use('/user', userRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

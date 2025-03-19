@@ -25,7 +25,7 @@ export const authRouter: Router = (() => {
 
   router.post('/login', async (req: Request, res: Response) => {
     try {
-      const token = authService.login(req.body.address, req.body.signature);
+      const token = await authService.login(req.body.address, req.body.signature);
       res.cookie(tokenCookieName, token, {
         httpOnly: true,
         secure: true,
