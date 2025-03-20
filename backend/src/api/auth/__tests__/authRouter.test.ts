@@ -4,6 +4,7 @@ import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MESSAGE_TO_SIGN, TOKEN_COOKIE_NAME } from '@/api/auth/authConstants';
+import { userRepository } from '@/api/user/userRepository';
 import { app } from '@/server';
 
 describe('Auth API endpoints', () => {
@@ -37,6 +38,12 @@ describe('Auth API endpoints', () => {
 
   it('POST /auth/login - success', async () => {
     vi.spyOn(jwt, 'sign').mockImplementation(() => 'mocked-jwt-token');
+    vi.spyOn(userRepository, 'getUserByAddress').mockResolvedValue({
+      address: '',
+      balance: '0',
+      createdAt: new Date(),
+      id: '1',
+    });
 
     const response = await request(app)
       .post('/auth/login')

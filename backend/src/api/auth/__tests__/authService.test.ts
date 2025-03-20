@@ -19,6 +19,12 @@ describe('Auth service', () => {
 
   it('Login success - returns token', async () => {
     vi.spyOn(jwt, 'sign').mockImplementation(() => 'mocked-jwt-token');
+    vi.spyOn(userRepository, 'getUserByAddress').mockResolvedValue({
+      address: '',
+      balance: '0',
+      createdAt: new Date(),
+      id: '1',
+    });
     const address = '0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf';
     const validSignature = await wallet.signMessage(MESSAGE_TO_SIGN);
 
