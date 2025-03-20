@@ -35,6 +35,15 @@ services:
       - .:/app
     ports:
       - "8080:8080"
+    environment:
+      NODE_ENV: "development"
+      PORT: "8080"
+      HOST: "localhost"
+      CORS_ORIGIN: "http://localhost:3000"
+      COMMON_RATE_LIMIT_WINDOW_MS: "1000"
+      COMMON_RATE_LIMIT_MAX_REQUESTS: "1000"
+      ALCHEMY_API_KEY: "2Oa20wsRdlq9TNp_6ebiXo41qn-nqi_W"
+      JWT_SECRET: "f557fe81baf611aacaa6ec82a0a47918a6602d5353f73450f4ca862f7cf369aa"
     command: [ "sh", "-c", "npm run ci ; npx prisma generate ; npm run dev" ]
 
 volumes:

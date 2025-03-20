@@ -2,40 +2,20 @@
 
 ## 🛠️ Getting Started
 
-### Step 1: ⚙️ Environment Configuration
-
-- Create `.env` and fill it up with the next data:
-```
-# Environment Configuration
-NODE_ENV="development" # Options: 'development', 'production'
-PORT="8080"            # The port your server will listen on
-HOST="localhost"       # Hostname for the server
-
-# CORS Settings
-CORS_ORIGIN="http://localhost:3000" # Allowed CORS origin, adjust as necessary
-
-# Rate Limiting
-COMMON_RATE_LIMIT_WINDOW_MS="1000" # Window size for rate limiting (ms)
-COMMON_RATE_LIMIT_MAX_REQUESTS="1000" # Max number of requests per window per IP
-
-# API keys
-ALCHEMY_API_KEY="2Oa20wsRdlq9TNp_6ebiXo41qn-nqi_W"
-
-# Auth secret
-JWT_SECRET="f557fe81baf611aacaa6ec82a0a47918a6602d5353f73450f4ca862f7cf369aa"
-```
- ⚠️️Important! ⚠️<br />
-I completely understand that leaking private information is unacceptable, but here I decided to keep it intended. Anyway, I will delete this project in Alchemy after you check my home assignment task, so it makes the testing process easier without making you creating a new project in Alchemy. <br />
-I really want to mention that I would **_never_** do it in the real project. 
-
-### Step 2: 🏃‍♂️ Running the Project
+🏃‍♂️ Running the Project
 
 For easier testing I wrapped the backend application into a docker container. In includes the node.js project, database migration, database itself. <br />
-So, to start the application you only need to execute the next command:
+So, to start the application you only need to have Docker installed on your machine and execute the next command:
 ```bash
 docker-compose up
 ```
 After that you should be able to see the application by opening [http://localhost:8080](http://localhost:8080) in your browser.
+
+⚠️️Important! ⚠️<br />
+I added env variables directly into the docker file because I wanted to achieve the test process as fast as possible, just with one command without too many actions around. <br />
+There are some env variables that have private information, like Alchemy project key. Since those variables are visible in the repository I'd like to mention something here. <br />
+I completely understand that leaking private information is unacceptable, but here I decided to keep it intended. Anyway, I will delete this project in Alchemy after you check my home assignment task. <br />
+I really want to mention that I would **_never_** do it in a real project, and it was implemented in this way on purpose.
 
 ## General information
 
