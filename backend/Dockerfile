@@ -3,6 +3,9 @@ FROM node:current-slim
 # Create app directory
 WORKDIR /usr/src/app
 
+# Install Python, g++, make
+RUN apt-get update && apt-get install -y python3 g++ make
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 

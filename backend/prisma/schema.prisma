@@ -6,11 +6,12 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://admin:admin@my_postgres:5432/jumper?schema=public"
+  url      = "postgresql://admin:admin@jumper-database:5432/jumper?schema=public"
 }
 
 model User {
