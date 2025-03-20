@@ -40,6 +40,19 @@ class UserRepository {
       LIMIT ${LEADERBOARD_LIMIT};
     `;
   }
+
+  /**
+   * Set the user's balance in the database
+   * @param address Address of the user whose balance should be updated
+   * @param newBalance New balance of the user
+   * @return Updated user object if was updated
+   */
+  setUserBalance(address: string, newBalance: string): Promise<User | null> {
+    return prisma.user.update({
+      where: { address: address },
+      data: { balance: newBalance },
+    });
+  }
 }
 
 export const userRepository = new UserRepository();

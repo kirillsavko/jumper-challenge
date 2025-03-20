@@ -39,4 +39,10 @@ describe('User repository', () => {
     const result = await userRepository.getLeaderboard();
     expect(result).toStrictEqual([user]);
   });
+
+  it('setUserBalance - returns user after updating', async () => {
+    vi.spyOn(prisma.user, 'update').mockResolvedValue(user);
+    const result = await userRepository.setUserBalance('0x123', '0');
+    expect(result).toStrictEqual(user);
+  });
 });

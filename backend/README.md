@@ -57,6 +57,7 @@ The endpoint is accessible under the `GET /balances/{address}` route. The endpoi
 
 ### Getting leaderboard endpoint
 The endpoint is accessible under the `GET /user/leaderboard` route. It returns the sorted leaderboard list across all users that have logged in the application. The limit is restricted by 100. If we were needed to return the leaderboard without any limit then I'd go with a pagination to don't make the request that heavy. <br />
+The logic works a bit tricky. I update the balance record in the database every time the user logs in. I understand that this solution provides the leaderboard that isn't connected to the real-time data, but creating the entire leaderboard by checking balances of top 100 users makes the request very heavy. That's why I did it in that way. <br/>
 Also, after the implementation I caught myself thinking that I probably implemented it in a wrong way. I just summed up all tokens of the user without converting it to for instance US dollar. But I'm not really sure here, so I decided to keep it as it's.
 
 

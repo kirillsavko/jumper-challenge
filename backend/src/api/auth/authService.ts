@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { MESSAGE_TO_SIGN } from '@/api/auth/authConstants';
 import { userRepository } from '@/api/user/userRepository';
+import { userService } from '@/api/user/userService';
 import { z } from '@/common/config/zod';
 import { alchemyService } from '@/common/utils/alchemy';
 import { env } from '@/common/utils/envConfig';
@@ -99,6 +100,9 @@ class AuthService {
     const foundUser = await userRepository.getUserByAddress(address);
     if (!foundUser) {
       this.register(address);
+    } else {
+      // On every login the user's balance is updated in the database
+      userService.updateUserBalance(address);
     }
 
     return jwt.sign({ address }, env.JWT_SECRET, { expiresIn: '1h' });

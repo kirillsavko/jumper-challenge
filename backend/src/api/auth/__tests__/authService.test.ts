@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { MESSAGE_TO_SIGN } from '@/api/auth/authConstants';
 import { authService, InvalidSignatureError, UserExistsError, WrongInputError } from '@/api/auth/authService';
 import { userRepository } from '@/api/user/userRepository';
+import { userService } from '@/api/user/userService';
 import { alchemyService } from '@/common/utils/alchemy';
 
 describe('Auth service', () => {
@@ -74,6 +75,31 @@ describe('Auth service', () => {
     expect(authService.register).toBeCalledTimes(0);
     await authService.login('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf', validSignature);
     expect(authService.register).toBeCalledTimes(0);
+  });
+
+  it('Users balance is updated in DB when user exists', async () => {
+    vi.spyOn(userRepository, 'getUserByAddress').mockResolvedValue({
+      address: '',
+      balance: '',
+      id: '',
+      createdAt: new Date(),
+    });
+    vi.spyOn(userService, 'updateUserBalance').mockImplementation(vi.fn());
+    const validSignature = await wallet.signMessage(MESSAGE_TO_SIGN);
+
+    expect(userService.updateUserBalance).toBeCalledTimes(0);
+    await authService.login('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf', validSignature);
+    expect(userService.updateUserBalance).toBeCalledTimes(1);
+  });
+
+  it('Users balance is not updated in DB when user does not exist', async () => {
+    vi.spyOn(userRepository, 'getUserByAddress').mockResolvedValue(null);
+    vi.spyOn(userService, 'updateUserBalance').mockImplementation(vi.fn());
+    const validSignature = await wallet.signMessage(MESSAGE_TO_SIGN);
+
+    expect(userService.updateUserBalance).toBeCalledTimes(0);
+    await authService.login('0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf', validSignature);
+    expect(userService.updateUserBalance).toBeCalledTimes(0);
   });
 
   it('Register success', async () => {
